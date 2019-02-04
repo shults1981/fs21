@@ -15,11 +15,16 @@
 |****************************************************************
 |****************************************************************
 */
+//#include <gtkmm.h>
+
 #include <iostream>
 //#include <ncurses.h>
 #include <stdlib.h>
 #include <fstream>
 #include <unistd.h>
+
+//#include <gdkmm-3.0/gdkmm.h>
+//#include <gtkmm-3.0/gtkmm.h>
 
 #include <signal.h>
 #include <sys/time.h>
@@ -76,7 +81,13 @@ int main (int argc, char** argv)
 
 	signal(SIGALRM,GTI);// registring game timer
 	
-	init_scr(&row_max,&col_max); // initialize ncurses;
+//	init_scr(&row_max,&col_max); // initialize ncurses;
+/*
+	auto app=Gtk::Aplication::create(argc,argv,"org.gtkmm.examples.base");
+	Gtk::Window window;
+	window.set_default_size(200,200);
+*/	
+
 	gameFild.border_x_min=col_max-9*col_max/10;
 	gameFild.border_x_max=col_max-2*col_max/10;
 	gameFild.border_y_min=row_max-9*row_max/10;
@@ -87,13 +98,14 @@ int main (int argc, char** argv)
 
 
 	CreateGameFild(gameFild,row_max,col_max);  //---------- Draw game fild ----------------------
-
-
+	
+	
+	
 	//--------------------- main cicle---------------		
-
+/*
 	while (PRG)
 	{
-/*
+
 		ch=wgetch(stdscr);
 	
 	
@@ -198,15 +210,19 @@ int main (int argc, char** argv)
 			}
 
 		}
-	*/
+	
 	}
-
+*/
 	delete GameController;
-	destr_scr();//-----------delete screen -------------
+//	destr_scr();//-----------delete screen -------------
+
 	
 //	fout.close();
-
 	return 0;
+
+/*	return app->run(window);*/
+
+
 }	
 
 
