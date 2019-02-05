@@ -15,7 +15,7 @@
 |****************************************************************
 |****************************************************************
 */
-//#include <gtkmm.h>
+#include <gtkmm.h>
 
 #include <iostream>
 //#include <ncurses.h>
@@ -23,8 +23,6 @@
 #include <fstream>
 #include <unistd.h>
 
-//#include <gdkmm-3.0/gdkmm.h>
-//#include <gtkmm-3.0/gtkmm.h>
 
 #include <signal.h>
 #include <sys/time.h>
