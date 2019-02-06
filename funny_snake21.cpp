@@ -16,9 +16,11 @@
 |****************************************************************
 */
 #include <gtkmm.h>
+#include <gtkmm/drawingarea.h>
+#include <cairomm/context.h>
+
 
 #include <iostream>
-//#include <ncurses.h>
 #include <stdlib.h>
 #include <fstream>
 #include <unistd.h>
@@ -58,7 +60,37 @@ int GameImpuls=0;
 int ImpulsFront=0;
 int Watchdog=0;
 
+//++++++++++++++++++++++++++++
 
+class MyArea: public Gtk::DrawingArea
+{
+public:
+	MyArea();		
+	virtual ~MyArea();
+
+protected:
+	bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
+
+};
+
+MyArea::MyArea()
+{
+}
+
+MyArea::~MyArea()
+{
+
+}
+
+bool MyArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
+{
+	Gtk::Allocation allocation = get_allocation();	
+
+	return true;
+}
+
+
+//++++++++++++++++++++++++++++
 
 //WINDOW *MainMenu, *tuneMenu;
 
@@ -80,11 +112,22 @@ int main (int argc, char** argv)
 	signal(SIGALRM,GTI);// registring game timer
 	
 //	init_scr(&row_max,&col_max); // initialize ncurses;
-/*
-	auto app=Gtk::Aplication::create(argc,argv,"org.gtkmm.examples.base");
+
+
+	Glib::RefPtr<Gtk::Application> app;
 	Gtk::Window window;
-	window.set_default_size(200,200);
-*/	
+	MyArea area;	
+
+	//auto app=Gtk::Application::create(argc,argv,"org.gtkmm.examples.base"); //if using C++11 or hi
+	app=Gtk::Application::create(argc,argv,"org.gtkmm.examples.base");
+	window.set_default_size(300,300);
+	window.set_title("FunnySnake21");
+	window.add(area);
+	area.show();		
+
+
+
+
 
 	gameFild.border_x_min=col_max-9*col_max/10;
 	gameFild.border_x_max=col_max-2*col_max/10;
@@ -95,7 +138,7 @@ int main (int argc, char** argv)
 	GameController=new Game(gameFild,6,0);
 
 
-	CreateGameFild(gameFild,row_max,col_max);  //---------- Draw game fild ----------------------
+//	CreateGameFild(gameFild,row_max,col_max);  //---------- Draw game fild ----------------------
 	
 	
 	
@@ -216,9 +259,8 @@ int main (int argc, char** argv)
 
 	
 //	fout.close();
-	return 0;
 
-/*	return app->run(window);*/
+	return app->run(window);
 
 
 }	
