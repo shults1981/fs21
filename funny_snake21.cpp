@@ -62,33 +62,41 @@ int Watchdog=0;
 
 //++++++++++++++++++++++++++++
 
-class MyArea: public Gtk::DrawingArea
+class Wnd: public Gtk::Window
 {
 public:
-	MyArea();		
-	virtual ~MyArea();
+	Wnd();		
+	virtual ~Wnd();
 
 protected:
-	bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
+	Gtk::DrawingArea area;
+
+
+	
+	//	bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
 
 };
 
-MyArea::MyArea()
+Wnd::Wnd()
 {
+	this->set_default_size(300,300);
+	this->set_title("FunnySnake21");
+	this->add(area);
+	area.show();		
+
 }
 
-MyArea::~MyArea()
+Wnd::~Wnd()
 {
 
 }
-
+/*
 bool MyArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
 	Gtk::Allocation allocation = get_allocation();	
-
 	return true;
 }
-
+*/
 
 //++++++++++++++++++++++++++++
 
@@ -109,26 +117,18 @@ int main (int argc, char** argv)
 	int PRG=1;
 	struct itimerval tmr1; //,tmr2;
 
-	signal(SIGALRM,GTI);// registring game timer
+//	signal(SIGALRM,GTI);// registring game timer
 	
 //	init_scr(&row_max,&col_max); // initialize ncurses;
 
-
 	Glib::RefPtr<Gtk::Application> app;
-	Gtk::Window window;
-	MyArea area;	
-
 	//auto app=Gtk::Application::create(argc,argv,"org.gtkmm.examples.base"); //if using C++11 or hi
 	app=Gtk::Application::create(argc,argv,"org.gtkmm.examples.base");
-	window.set_default_size(300,300);
-	window.set_title("FunnySnake21");
-	window.add(area);
-	area.show();		
+
+	Wnd wnd;
 
 
-
-
-
+/*
 	gameFild.border_x_min=col_max-9*col_max/10;
 	gameFild.border_x_max=col_max-2*col_max/10;
 	gameFild.border_y_min=row_max-9*row_max/10;
@@ -136,7 +136,7 @@ int main (int argc, char** argv)
 
 	Game *GameController;
 	GameController=new Game(gameFild,6,0);
-
+*/
 
 //	CreateGameFild(gameFild,row_max,col_max);  //---------- Draw game fild ----------------------
 	
@@ -254,14 +254,14 @@ int main (int argc, char** argv)
 	
 	}
 */
-	delete GameController;
+//	delete GameController;
 //	destr_scr();//-----------delete screen -------------
 
 	
 //	fout.close();
 
-	return app->run(window);
-
+	app->run(wnd);
+	return 0;
 
 }	
 
