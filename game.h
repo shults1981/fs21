@@ -16,7 +16,7 @@
 //-------------------------
 
 
-typedef enum _game_status{game_exit=0,game_stop,game_on,game_over,game_new,game_new_level} GameStatus;
+typedef enum _game_status{game_exit=0,game_menu,game_stop,game_on,game_over,game_new,game_new_level} GameStatus;
 typedef enum _unit_status{unit_is_dead=0,unit_is_alive} UnitStatus;
 typedef enum _move_direction{Left=1,Right,Up,Down} MoveDirection;
 

@@ -68,20 +68,37 @@ public:
 	Wnd();		
 	virtual ~Wnd();
 
+	Fild gameFild;
+	Game *GameController;
+	MoveDirection mvf;
+
 protected:
 	Gtk::DrawingArea area;
 
-
-	
+	bool Tic();
+	bool Main_Loop();
+	bool on_key_press_event(GdkEventKey* key_event);	
 	//	bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
 
 };
 
 Wnd::Wnd()
 {
+	gameFild.border_x_min=0;
+	gameFild.border_x_max=50;
+	gameFild.border_y_min=0;
+	gameFild.border_y_max=50;
+
+	GameController=new Game(gameFild,6,0);
+	
 	this->set_default_size(300,300);
 	this->set_title("FunnySnake21");
 	this->add(area);
+
+	add_events(Gdk::KEY_PRESS_MASK);
+	
+	Glib::signal_timeout().connect( sigc::mem_fun(*this, &Wnd::Tic), 200 );
+	
 	area.show();		
 
 }
@@ -89,6 +106,106 @@ Wnd::Wnd()
 Wnd::~Wnd()
 {
 
+	delete GameController;
+
+}
+
+bool Wnd::Tic()
+{
+	Main_Loop();	
+	
+	return true;
+}
+
+bool Wnd::Main_Loop()
+{
+
+	switch (GameController->getGameStatus())
+	{
+		case game_on:
+			GameController->SnakeControl(mvf);
+			GameController->SnakeMoveToOneStep();
+			break;
+
+		default:
+			break;
+	}
+
+
+	g_print("Game Step\n");					
+	return true;
+}
+
+bool Wnd::on_key_press_event(GdkEventKey* key_event)
+{
+
+	if (key_event->keyval==GDK_KEY_m){
+		GameController->setGameStatus(game_stop);
+	}
+	if (GameController->getGameStatus()==game_stop||GameController->getGameStatus()==game_over){
+		switch (key_event->keyval)  {
+			case GDK_KEY_e:
+				GameController->setGameStatus(game_over);
+				GameController->setGameStatus(game_exit);
+				break;
+			case GDK_KEY_n:
+				GameController->setGameStatus(game_stop);
+				GameController->setGameStatus(game_over);
+			//	CreateGameFild(gameFild,row_max,col_max);				
+				GameController->setGameStatus(game_new);
+				GameController->setGameStatus(game_on);
+				mvf=static_cast<MoveDirection>(0);
+				break;
+			case GDK_KEY_c:
+				if(GameController->getGameStatus()!=game_over)
+				{
+					GameController->setGameStatus(game_on);
+//					CreateGameFild(gameFild,row_max,col_max);				
+				}
+				break;
+			default:
+				break;
+
+		}
+	}
+
+	if (GameController->getGameStatus()==game_new_level){
+//		GameController->setGameStatus(game_stop);
+//		GameController->setGameStatus(game_over);
+//		CreateGameFild(gameFild,row_max,col_max);				
+//		
+						
+//		GameController->setGameStatus(game_new);
+//		GameController->setGameStatus(game_on);
+//		mvf=static_cast<MoveDirection>(0);
+	}
+
+
+	if (GameController->getGameStatus()==game_on){
+		switch(key_event->keyval)
+		{
+			case GDK_KEY_Left:
+					mvf=Left;
+					g_print("Pressed key -Left key-\n");					
+					break;			
+			case GDK_KEY_Right:
+					mvf=Right;
+					g_print("Pressed key -Right key-\n");					
+					break;
+			case GDK_KEY_Up:
+					mvf=Up;
+					g_print("Pressed key -Up key-\n");					
+					break;
+			case GDK_KEY_Down:
+					mvf=Down;
+					g_print("Pressed key -Down key-\n");					
+					break; 
+			default : break;
+			}
+//			GameController->SnakeControl(mvf);
+	}
+
+	return true;
 }
 /*
 bool MyArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
@@ -99,10 +216,6 @@ bool MyArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 */
 
 //++++++++++++++++++++++++++++
-
-//WINDOW *MainMenu, *tuneMenu;
-
-Fild gameFild;
 
 
 //ofstream fout;//**********************-------------------
@@ -128,15 +241,6 @@ int main (int argc, char** argv)
 	Wnd wnd;
 
 
-/*
-	gameFild.border_x_min=col_max-9*col_max/10;
-	gameFild.border_x_max=col_max-2*col_max/10;
-	gameFild.border_y_min=row_max-9*row_max/10;
-	gameFild.border_y_max=row_max-2*row_max/10;
-
-	Game *GameController;
-	GameController=new Game(gameFild,6,0);
-*/
 
 //	CreateGameFild(gameFild,row_max,col_max);  //---------- Draw game fild ----------------------
 	
@@ -254,7 +358,6 @@ int main (int argc, char** argv)
 	
 	}
 */
-//	delete GameController;
 //	destr_scr();//-----------delete screen -------------
 
 	

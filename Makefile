@@ -16,11 +16,11 @@ game.o:game.cpp game.h
 unit.o:unit.cpp unit.h
 	$(CC) -g -c -o unit.o unit.cpp
 
-test:$(TARGET_TEST)
-$(TARGET_TEST):funny_snake21_test.o game.o unit.o
-	$(CC) -g -o $(TARGET_TEST) funny_snake21_test.o game.o unit.o -lncurses
-funny_snake21_test.o:funny_snake21_test.cpp
-	$(CC) -g -c -o funny_snake2_test.o funny_snake2_test.cpp
+#test:$(TARGET_TEST)
+#$(TARGET_TEST):funny_snake21_test.o game.o unit.o
+#	$(CC) -g -o $(TARGET_TEST) funny_snake21_test.o game.o unit.o -lncurses
+#funny_snake21_test.o:funny_snake21_test.cpp
+#	$(CC) -g -c -o funny_snake2_test.o funny_snake2_test.cpp
 
 
 clean:
