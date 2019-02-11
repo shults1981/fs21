@@ -10,7 +10,7 @@
 * Data create                    :  03/02/2019
 
 * Purpose                        :  classical game "SNAKE";
-				    testing library gtk  #2
+				    testing library gtk  #2 (gtkmm)
 
 |****************************************************************
 |****************************************************************
@@ -62,17 +62,18 @@ int Watchdog=0;
 
 //++++++++++++++++++++++++++++
 
-class Wnd: public Gtk::Window
+class MainWindow: public Gtk::Window
 {
 public:
-	Wnd();		
-	virtual ~Wnd();
+	MainWindow();		
+	virtual ~MainWindow();
 
 	Fild gameFild;
 	Game *GameController;
 	MoveDirection mvf;
 
 protected:
+	GameStatus PST; 
 	Gtk::DrawingArea area;
 
 	bool Tic();
@@ -82,7 +83,7 @@ protected:
 
 };
 
-Wnd::Wnd()
+MainWindow::MainWindow()
 {
 	gameFild.border_x_min=0;
 	gameFild.border_x_max=50;
@@ -97,27 +98,27 @@ Wnd::Wnd()
 
 	add_events(Gdk::KEY_PRESS_MASK);
 	
-	Glib::signal_timeout().connect( sigc::mem_fun(*this, &Wnd::Tic), 200 );
+	Glib::signal_timeout().connect( sigc::mem_fun(*this, &MainWindow::Tic), 200 );
 	
 	area.show();		
 
 }
 
-Wnd::~Wnd()
+MainWindow::~MainWindow()
 {
 
 	delete GameController;
 
 }
 
-bool Wnd::Tic()
+bool MainWindow::Tic()
 {
 	Main_Loop();	
 	
 	return true;
 }
 
-bool Wnd::Main_Loop()
+bool MainWindow::Main_Loop()
 {
 
 	switch (GameController->getGameStatus())
@@ -136,7 +137,7 @@ bool Wnd::Main_Loop()
 	return true;
 }
 
-bool Wnd::on_key_press_event(GdkEventKey* key_event)
+bool MainWindow::on_key_press_event(GdkEventKey* key_event)
 {
 
 	if (key_event->keyval==GDK_KEY_m){
@@ -238,7 +239,7 @@ int main (int argc, char** argv)
 	//auto app=Gtk::Application::create(argc,argv,"org.gtkmm.examples.base"); //if using C++11 or hi
 	app=Gtk::Application::create(argc,argv,"org.gtkmm.examples.base");
 
-	Wnd wnd;
+	MainWindow w;
 
 
 
@@ -363,7 +364,7 @@ int main (int argc, char** argv)
 	
 //	fout.close();
 
-	app->run(wnd);
+	app->run(w);
 	return 0;
 
 }	
