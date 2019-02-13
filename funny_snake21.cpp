@@ -61,7 +61,161 @@ int ImpulsFront=0;
 int Watchdog=0;
 
 //++++++++++++++++++++++++++++
+//==================================================
+class MyArea:public Gtk::DrawingArea
+{
+public:
+	 MyArea();
+	~MyArea();
 
+protected:
+
+	guint X_max,Y_max;
+
+	bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
+};
+
+MyArea::MyArea()
+{
+}
+MyArea::~MyArea()
+{
+}
+
+bool MyArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
+{
+
+	guint width, height;
+	GdkRGBA color;
+	GtkStyleContext *context;
+
+	guint  x,y;
+	guint i,k,m;
+	guint scr_border_x_min,scr_border_x_max,scr_border_y_min,scr_border_y_max;
+	gfloat hStep,vStep;
+
+//	context=gtk_widget_get_style_context(widget);
+
+	Gtk::Allocation allocation = get_allocation();	
+
+	width=allocation.get_width();
+	height=allocation.get_height();
+
+	X_max=width;
+	Y_max=height;
+
+	scr_border_x_min=(X_max-9*X_max/10);
+	scr_border_x_max=(X_max-1*X_max/10);
+	scr_border_y_min=(Y_max-9*Y_max/10);
+	scr_border_y_max=(Y_max-1*Y_max/10);
+/*
+	hStep=(gfloat)(scr_border_x_max-scr_border_x_min)/(gfloat)(border_x_max-border_x_min);
+	vStep=(gfloat)(scr_border_y_max-scr_border_y_min)/(gfloat)(border_y_max-border_y_min);
+
+//	gtk_render_background(context,cr,0,0,width,height);
+
+	//---------- Make game fild ----------------------
+	color.red=0.0;
+	color.green=0.0;
+	color.blue=0.0;
+	color.alpha=1.0;
+	gdk_cairo_set_source_rgba(cr,&color);
+
+
+	cairo_move_to (cr,scr_border_x_min,scr_border_y_min);
+	cairo_line_to(cr,scr_border_x_max+hStep,scr_border_y_min);
+	cairo_line_to(cr,scr_border_x_max+hStep,scr_border_y_max+vStep);
+	cairo_line_to(cr,scr_border_x_min,scr_border_y_max+vStep);
+	cairo_line_to(cr,scr_border_x_min,scr_border_y_min);
+	cairo_set_line_width(cr,2.0);
+	cairo_stroke(cr);	
+
+	cairo_move_to(cr,scr_border_x_min,scr_border_y_min-10);
+	cairo_show_text(cr," Game SNAKE  ");
+
+*/
+	
+//*************************************************
+/*
+	if (GST==game_menu)
+	{
+		// -- menu border
+		cairo_move_to (cr,scr_border_x_max/2-25,scr_border_y_max/2-10);
+		cairo_line_to(cr,scr_border_x_max/2+65,scr_border_y_max/2-10);
+		cairo_line_to(cr,scr_border_x_max/2+65,scr_border_y_max/2+45);
+		cairo_line_to(cr,scr_border_x_max/2-25,scr_border_y_max/2+45);
+		cairo_line_to(cr,scr_border_x_max/2-25,scr_border_y_max/2-10);
+		cairo_set_line_width(cr,1.0);
+		cairo_stroke(cr);
+		// -- menu text
+		cairo_move_to(cr,scr_border_x_max/2-20,scr_border_y_max/2);
+		cairo_show_text(cr,"       MENU:");
+		cairo_move_to(cr,scr_border_x_max/2-20,scr_border_y_max/2+10);
+		cairo_show_text(cr,"NEW GAME....'n'");
+		cairo_move_to(cr,scr_border_x_max/2-20,scr_border_y_max/2+20);
+		cairo_show_text(cr,"MENU/PAUSE.'m'");
+		cairo_move_to(cr,scr_border_x_max/2-20,scr_border_y_max/2+30);
+		cairo_show_text(cr,"CONTINUE.......'c'");
+		cairo_move_to(cr,scr_border_x_max/2-20,scr_border_y_max/2+40);
+		cairo_show_text(cr,"EXIT.....'ALT+F4'");
+	}
+
+
+	if (GST==game_on)
+	{
+	
+		if (rabbitInFild)
+			cairo_rectangle(cr,
+					scr_border_x_min+Rabbit->cord->_x*hStep,
+					scr_border_y_min+Rabbit->cord->_y*vStep,
+					hStep,
+					vStep);
+			cairo_set_line_width(cr,1.5);
+			cairo_fill(cr);
+
+		for(i=0;i<Snake->len;i++ )
+		{
+			cairo_rectangle(cr,
+					scr_border_x_min+Snake->cord[i]._x*hStep,
+					scr_border_y_min+Snake->cord[i]._y*vStep,
+					hStep,
+					vStep);			
+		}
+
+		//====  information ====
+		sprintf (str_BUF1,"%d",Score);
+		cairo_move_to(cr,scr_border_x_min,scr_border_y_max+15);
+		cairo_show_text(cr,"Score-");
+		cairo_move_to(cr,scr_border_x_min+60,scr_border_y_max+15);
+		cairo_show_text(cr,str_BUF1);
+
+		sprintf (str_BUF2,"%d",Level);
+		cairo_move_to(cr,scr_border_x_min,scr_border_y_max+25);
+		cairo_show_text(cr,"Level-");
+		cairo_move_to(cr,scr_border_x_min+60,scr_border_y_max+25);
+		cairo_show_text(cr,str_BUF2);
+	}
+	if (GST==game_next_level)
+	{
+		cairo_move_to(cr,scr_border_x_max/2-30,scr_border_y_max/2-20);
+		cairo_show_text(cr,"N E X T    L E V E L !!!!!");
+	}
+
+	if (PST==game_over)
+	{
+		cairo_move_to(cr,scr_border_x_max/2-30,scr_border_y_max/2-20);
+		cairo_show_text(cr,"G A M E   O V E R !!!!!");
+	}
+
+	cairo_fill(cr);
+*/	
+//**********************************
+
+	return false;
+
+}
+
+//====================================================
 class MainWindow: public Gtk::Window
 {
 public:
@@ -74,17 +228,16 @@ public:
 
 protected:
 
-//	enum _ProgrammStatus {g_exit=0,g_stop,g_new,g_continue} PST; 
 	GameStatus PST;
 
-	Gtk::DrawingArea area;
+	MyArea area;
 
 
 	bool Tic();
 	bool Main_Loop();
 	bool on_key_press_event(GdkEventKey* key_event);	
-	//	bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
-
+	void OnQuit();
+	
 };
 
 MainWindow::MainWindow()
@@ -104,7 +257,9 @@ MainWindow::MainWindow()
 	add_events(Gdk::KEY_PRESS_MASK);
 	
 	Glib::signal_timeout().connect( sigc::mem_fun(*this, &MainWindow::Tic), 200 );
-	
+
+
+
 	area.show();		
 
 }
@@ -119,7 +274,7 @@ MainWindow::~MainWindow()
 bool MainWindow::Tic()
 {
 	Main_Loop();	
-	
+	area.queue_draw();	
 	return true;
 }
 
@@ -130,6 +285,7 @@ bool MainWindow::Main_Loop()
 		case game_exit:
 			GameController->setGameStatus(game_over);
 			GameController->setGameStatus(game_exit);
+			OnQuit();
 			break;
 		case game_new:
 			GameController->setGameStatus(game_stop);
@@ -169,7 +325,8 @@ bool MainWindow::Main_Loop()
 			mvf=static_cast<MoveDirection>(0);
 		}
 
-
+		if (GameController->getGameStatus()==game_over)
+			PST=game_over;
 
 
 	g_print("Game Step\n");					
@@ -182,22 +339,6 @@ bool MainWindow::on_key_press_event(GdkEventKey* key_event)
 	if (key_event->keyval==GDK_KEY_m){
 		PST=game_stop;
 	}
-	if (PST==game_stop||PST==game_over){//!!!!!!!!!!!11
-		switch (key_event->keyval)  {
-			case GDK_KEY_e:
-				PST=game_exit;
-				break;
-			case GDK_KEY_n:
-				PST=game_new;
-				break;
-			case GDK_KEY_c:
-				PST=game_on;
-				break;
-			default:
-				break;
-		}
-	}
-
 
 	if (PST==game_on){
 		switch(key_event->keyval)
@@ -222,15 +363,33 @@ bool MainWindow::on_key_press_event(GdkEventKey* key_event)
 			}
 	}
 
+	if (PST==game_stop||PST==game_over){
+		switch (key_event->keyval)  {
+			case GDK_KEY_e:
+				PST=game_exit;
+				break;
+			case GDK_KEY_n:
+				PST=game_new;
+				break;
+			case GDK_KEY_c:
+				PST=game_on;
+				break;
+			default:
+				break;
+		}
+	}
+
 	return true;
 }
-/*
-bool MyArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
+
+void MainWindow::OnQuit()
 {
-	Gtk::Allocation allocation = get_allocation();	
-	return true;
+	hide();
 }
-*/
+
+
+//=======================================================================
+
 
 //++++++++++++++++++++++++++++
 
