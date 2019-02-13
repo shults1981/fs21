@@ -69,12 +69,16 @@ public:
 	virtual ~MainWindow();
 
 	Fild gameFild;
-	Game *GameController;
-	MoveDirection mvf;
+	Game *GameController; //!!!!!!
+	MoveDirection mvf;    ///!!
 
 protected:
-	GameStatus PST; 
+
+//	enum _ProgrammStatus {g_exit=0,g_stop,g_new,g_continue} PST; 
+	GameStatus PST;
+
 	Gtk::DrawingArea area;
+
 
 	bool Tic();
 	bool Main_Loop();
@@ -85,6 +89,7 @@ protected:
 
 MainWindow::MainWindow()
 {
+	PST=game_stop;
 	gameFild.border_x_min=0;
 	gameFild.border_x_max=50;
 	gameFild.border_y_min=0;
@@ -120,17 +125,51 @@ bool MainWindow::Tic()
 
 bool MainWindow::Main_Loop()
 {
-
-	switch (GameController->getGameStatus())
+	switch (PST)
 	{
-		case game_on:
-			GameController->SnakeControl(mvf);
-			GameController->SnakeMoveToOneStep();
+		case game_exit:
+			GameController->setGameStatus(game_over);
+			GameController->setGameStatus(game_exit);
 			break;
-
+		case game_new:
+			GameController->setGameStatus(game_stop);
+			GameController->setGameStatus(game_over);
+			GameController->setGameStatus(game_new);
+			GameController->setGameStatus(game_on);
+			mvf=static_cast<MoveDirection>(0);
+			PST=game_on;
+			break;
+		case game_stop:
+			GameController->setGameStatus(game_stop);
+			break;
+		case game_on:
+			if(GameController->getGameStatus()!=game_over){
+				GameController->setGameStatus(game_on);
+			}
+			else{
+				 PST=game_stop;
+			}
+			break;
 		default:
 			break;
 	}
+
+	
+		if (GameController->getGameStatus()==game_on)
+		{
+				GameController->SnakeControl(mvf);
+				GameController->SnakeMoveToOneStep();
+		}
+
+		if (GameController->getGameStatus()==game_new_level){
+			GameController->setGameStatus(game_stop);
+			GameController->setGameStatus(game_over);
+			GameController->setGameStatus(game_new);
+			GameController->setGameStatus(game_on);
+			mvf=static_cast<MoveDirection>(0);
+		}
+
+
 
 
 	g_print("Game Step\n");					
@@ -141,48 +180,26 @@ bool MainWindow::on_key_press_event(GdkEventKey* key_event)
 {
 
 	if (key_event->keyval==GDK_KEY_m){
-		GameController->setGameStatus(game_stop);
+		PST=game_stop;
 	}
-	if (GameController->getGameStatus()==game_stop||GameController->getGameStatus()==game_over){
+	if (PST==game_stop||PST==game_over){//!!!!!!!!!!!11
 		switch (key_event->keyval)  {
 			case GDK_KEY_e:
-				GameController->setGameStatus(game_over);
-				GameController->setGameStatus(game_exit);
+				PST=game_exit;
 				break;
 			case GDK_KEY_n:
-				GameController->setGameStatus(game_stop);
-				GameController->setGameStatus(game_over);
-			//	CreateGameFild(gameFild,row_max,col_max);				
-				GameController->setGameStatus(game_new);
-				GameController->setGameStatus(game_on);
-				mvf=static_cast<MoveDirection>(0);
+				PST=game_new;
 				break;
 			case GDK_KEY_c:
-				if(GameController->getGameStatus()!=game_over)
-				{
-					GameController->setGameStatus(game_on);
-//					CreateGameFild(gameFild,row_max,col_max);				
-				}
+				PST=game_on;
 				break;
 			default:
 				break;
-
 		}
 	}
 
-	if (GameController->getGameStatus()==game_new_level){
-//		GameController->setGameStatus(game_stop);
-//		GameController->setGameStatus(game_over);
-//		CreateGameFild(gameFild,row_max,col_max);				
-//		
-						
-//		GameController->setGameStatus(game_new);
-//		GameController->setGameStatus(game_on);
-//		mvf=static_cast<MoveDirection>(0);
-	}
 
-
-	if (GameController->getGameStatus()==game_on){
+	if (PST==game_on){
 		switch(key_event->keyval)
 		{
 			case GDK_KEY_Left:
@@ -203,7 +220,6 @@ bool MainWindow::on_key_press_event(GdkEventKey* key_event)
 					break; 
 			default : break;
 			}
-//			GameController->SnakeControl(mvf);
 	}
 
 	return true;
