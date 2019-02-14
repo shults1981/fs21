@@ -65,23 +65,27 @@ int Watchdog=0;
 class MyArea:public Gtk::DrawingArea
 {
 public:
-	 MyArea();
-	~MyArea();
 	Fild pole;
-
+	PointArr unit_snake,unit_rabit;
 	GameStatus PST;
+
+
+	MyArea();
+	~MyArea();
 
 protected:
 
-	Point pen;
 	guint X_max,Y_max;
 
 
 	bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
 };
 
-MyArea::MyArea()
+MyArea::MyArea():unit_snake(0),unit_rabit(0)
 {
+//	unit_snake(0);
+//	unit_rabit(0);
+
 }
 MyArea::~MyArea()
 {
@@ -389,7 +393,14 @@ bool MainWindow::on_key_press_event(GdkEventKey* key_event)
 }
 void MainWindow::_render()
 {
+	Point tp1;
 	area.PST=GameController->getGameStatus();
+	GameController->getRabbitPlace(tp1);
+	area.unit_rabit.setElement(tp1,0);
+
+
+
+
 	area.queue_draw();
 }
 
