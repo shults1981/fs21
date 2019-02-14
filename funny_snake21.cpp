@@ -67,10 +67,15 @@ class MyArea:public Gtk::DrawingArea
 public:
 	 MyArea();
 	~MyArea();
+	Fild pole;
+
+	GameStatus PST;
 
 protected:
 
+	Point pen;
 	guint X_max,Y_max;
+
 
 	bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
 };
@@ -94,7 +99,6 @@ bool MyArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 	guint scr_border_x_min,scr_border_x_max,scr_border_y_min,scr_border_y_max;
 	gfloat hStep,vStep;
 
-//	context=gtk_widget_get_style_context(widget);
 
 	Gtk::Allocation allocation = get_allocation();	
 
@@ -108,9 +112,9 @@ bool MyArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 	scr_border_x_max=(X_max-1*X_max/10);
 	scr_border_y_min=(Y_max-9*Y_max/10);
 	scr_border_y_max=(Y_max-1*Y_max/10);
-/*
-	hStep=(gfloat)(scr_border_x_max-scr_border_x_min)/(gfloat)(border_x_max-border_x_min);
-	vStep=(gfloat)(scr_border_y_max-scr_border_y_min)/(gfloat)(border_y_max-border_y_min);
+
+	hStep=(gfloat)(scr_border_x_max-scr_border_x_min)/(gfloat)(pole.border_x_max-pole.border_x_min);
+	vStep=(gfloat)(scr_border_y_max-scr_border_y_min)/(gfloat)(pole.border_y_max-pole.border_y_min);
 
 //	gtk_render_background(context,cr,0,0,width,height);
 
@@ -119,21 +123,21 @@ bool MyArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 	color.green=0.0;
 	color.blue=0.0;
 	color.alpha=1.0;
-	gdk_cairo_set_source_rgba(cr,&color);
+	cr->set_source_rgb(0.0,0.0,0.0);
 
 
-	cairo_move_to (cr,scr_border_x_min,scr_border_y_min);
-	cairo_line_to(cr,scr_border_x_max+hStep,scr_border_y_min);
-	cairo_line_to(cr,scr_border_x_max+hStep,scr_border_y_max+vStep);
-	cairo_line_to(cr,scr_border_x_min,scr_border_y_max+vStep);
-	cairo_line_to(cr,scr_border_x_min,scr_border_y_min);
-	cairo_set_line_width(cr,2.0);
-	cairo_stroke(cr);	
+	cr->move_to (scr_border_x_min,scr_border_y_min);
+	cr->line_to(scr_border_x_max+hStep,scr_border_y_min);
+	cr->line_to(scr_border_x_max+hStep,scr_border_y_max+vStep);
+	cr->line_to(scr_border_x_min,scr_border_y_max+vStep);
+	cr->line_to(scr_border_x_min,scr_border_y_min);
+	cr->set_line_width(2.0);
+	cr->stroke();	
 
-	cairo_move_to(cr,scr_border_x_min,scr_border_y_min-10);
-	cairo_show_text(cr," Game SNAKE  ");
+	cr->move_to(scr_border_x_min,scr_border_y_min-10);
+	cr->show_text(" Game SNAKE  ");
 
-*/
+
 	
 //*************************************************
 /*
@@ -237,7 +241,7 @@ protected:
 	bool Main_Loop();
 	bool on_key_press_event(GdkEventKey* key_event);	
 	void OnQuit();
-	
+	void _render();	
 };
 
 MainWindow::MainWindow()
@@ -249,7 +253,8 @@ MainWindow::MainWindow()
 	gameFild.border_y_max=50;
 
 	GameController=new Game(gameFild,6,0);
-	
+	area.pole=GameController->getGameFild();
+
 	this->set_default_size(300,300);
 	this->set_title("FunnySnake21");
 	this->add(area);
@@ -273,8 +278,9 @@ MainWindow::~MainWindow()
 
 bool MainWindow::Tic()
 {
-	Main_Loop();	
-	area.queue_draw();	
+	Main_Loop();
+	_render();	
+	
 	return true;
 }
 
@@ -380,6 +386,11 @@ bool MainWindow::on_key_press_event(GdkEventKey* key_event)
 	}
 
 	return true;
+}
+void MainWindow::_render()
+{
+	area.PST=GameController->getGameStatus();
+	area.queue_draw();
 }
 
 void MainWindow::OnQuit()
