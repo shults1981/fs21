@@ -93,7 +93,7 @@ MyArea::~MyArea()
 
 bool MyArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
-
+	Point pen;
 	guint width, height;
 	GdkRGBA color;
 	GtkStyleContext *context;
@@ -144,66 +144,65 @@ bool MyArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
 	
 //*************************************************
-/*
-	if (GST==game_menu)
+
+	if (PST==game_stop)
 	{
 		// -- menu border
-		cairo_move_to (cr,scr_border_x_max/2-25,scr_border_y_max/2-10);
-		cairo_line_to(cr,scr_border_x_max/2+65,scr_border_y_max/2-10);
-		cairo_line_to(cr,scr_border_x_max/2+65,scr_border_y_max/2+45);
-		cairo_line_to(cr,scr_border_x_max/2-25,scr_border_y_max/2+45);
-		cairo_line_to(cr,scr_border_x_max/2-25,scr_border_y_max/2-10);
-		cairo_set_line_width(cr,1.0);
-		cairo_stroke(cr);
+		cr->move_to (scr_border_x_max/2-25,scr_border_y_max/2-10);
+		cr->line_to(scr_border_x_max/2+65,scr_border_y_max/2-10);
+		cr->line_to(scr_border_x_max/2+65,scr_border_y_max/2+45);
+		cr->line_to(scr_border_x_max/2-25,scr_border_y_max/2+45);
+		cr->line_to(scr_border_x_max/2-25,scr_border_y_max/2-10);
+		cr->set_line_width(1.0);
+		cr->stroke();
 		// -- menu text
-		cairo_move_to(cr,scr_border_x_max/2-20,scr_border_y_max/2);
-		cairo_show_text(cr,"       MENU:");
-		cairo_move_to(cr,scr_border_x_max/2-20,scr_border_y_max/2+10);
-		cairo_show_text(cr,"NEW GAME....'n'");
-		cairo_move_to(cr,scr_border_x_max/2-20,scr_border_y_max/2+20);
-		cairo_show_text(cr,"MENU/PAUSE.'m'");
-		cairo_move_to(cr,scr_border_x_max/2-20,scr_border_y_max/2+30);
-		cairo_show_text(cr,"CONTINUE.......'c'");
-		cairo_move_to(cr,scr_border_x_max/2-20,scr_border_y_max/2+40);
-		cairo_show_text(cr,"EXIT.....'ALT+F4'");
+		cr->move_to(scr_border_x_max/2-20,scr_border_y_max/2);
+		cr->show_text("       MENU:");
+		cr->move_to(scr_border_x_max/2-20,scr_border_y_max/2+10);
+		cr->show_text("NEW GAME....'n'");
+		cr->move_to(scr_border_x_max/2-20,scr_border_y_max/2+20);
+		cr->show_text("MENU/PAUSE.'m'");
+		cr->move_to(scr_border_x_max/2-20,scr_border_y_max/2+30);
+		cr->show_text("CONTINUE.......'c'");
+		cr->move_to(scr_border_x_max/2-20,scr_border_y_max/2+40);
+		cr->show_text("EXIT.....'ALT+F4'");
 	}
 
 
-	if (GST==game_on)
+	if (PST==game_on||PST==game_new_level)
 	{
-	
-		if (rabbitInFild)
-			cairo_rectangle(cr,
-					scr_border_x_min+Rabbit->cord->_x*hStep,
-					scr_border_y_min+Rabbit->cord->_y*vStep,
-					hStep,
-					vStep);
-			cairo_set_line_width(cr,1.5);
-			cairo_fill(cr);
+		unit_rabbit.getElement(0,pen);
+		cr->rectangle(	scr_border_x_min+pen._x*hStep,
+				scr_border_y_min+pen._y*vStep,
+				hStep,
+				vStep);
+		cr->set_line_width(1.5);
+		cr->fill();
 
-		for(i=0;i<Snake->len;i++ )
+		for(i=0;i<unit_snake.getLen();i++ )
 		{
-			cairo_rectangle(cr,
-					scr_border_x_min+Snake->cord[i]._x*hStep,
-					scr_border_y_min+Snake->cord[i]._y*vStep,
+			unit_snake.getElement(i,pen);
+			cr->rectangle(	scr_border_x_min+pen._x*hStep,
+					scr_border_y_min+pen._y*vStep,
 					hStep,
 					vStep);			
 		}
 
 		//====  information ====
-		sprintf (str_BUF1,"%d",Score);
-		cairo_move_to(cr,scr_border_x_min,scr_border_y_max+15);
-		cairo_show_text(cr,"Score-");
-		cairo_move_to(cr,scr_border_x_min+60,scr_border_y_max+15);
-		cairo_show_text(cr,str_BUF1);
+//		sprintf (str_BUF1,"%d",Score);
+		cr->move_to(scr_border_x_min,scr_border_y_max+15);
+		cr->show_text("Score-");
+		cr->move_to(scr_border_x_min+60,scr_border_y_max+15);
+//		cr->show_text(str_BUF1);
 
-		sprintf (str_BUF2,"%d",Level);
-		cairo_move_to(cr,scr_border_x_min,scr_border_y_max+25);
-		cairo_show_text(cr,"Level-");
-		cairo_move_to(cr,scr_border_x_min+60,scr_border_y_max+25);
-		cairo_show_text(cr,str_BUF2);
+//		sprintf (str_BUF2,"%d",Level);
+		cr->move_to(scr_border_x_min,scr_border_y_max+25);
+		cr->show_text("Level-");
+		cr->move_to(scr_border_x_min+60,scr_border_y_max+25);
+//		cr->show_text(str_BUF2);
 	}
-	if (GST==game_next_level)
+/*
+	if (PST==game_next_level)
 	{
 		cairo_move_to(cr,scr_border_x_max/2-30,scr_border_y_max/2-20);
 		cairo_show_text(cr,"N E X T    L E V E L !!!!!");
@@ -217,6 +216,56 @@ bool MyArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
 	cairo_fill(cr);
 */	
+
+
+
+/*		
+	if ((GameCntrl->getGameStatus()==game_on)||(GameCntrl->getGameStatus()==game_new_level)){
+		GameCntrl->getRabbitPlace(pen);
+//		mvaddch(pen._y,pen._x,'*');
+
+
+		for (int i=0;i<GameCntrl->getSnakeLen();i++){
+
+			if (GameCntrl->getSnakeBodyPartsCords(i,pen)){
+			        if (FrameFlag){
+//					mvaddch(pen._y,pen._x,'@');
+				;
+				}	
+				else
+//					mvaddch(pen._y,pen._x,' ');
+					;
+			}
+		}
+
+//			sprintf(str_BUF1,"%d",GameCntrl->getGameScore());
+//			mvaddstr(pole.border_y_max+2,pole.border_x_min,"Score-");			
+//			mvaddstr(pole.border_y_max+2,pole.border_x_min+7,str_BUF1);		
+//			sprintf(str_BUF2,"%d",GameCntrl->getGameLevel());
+//			mvaddstr(pole.border_y_max+3,pole.border_x_min,"Level-");			
+//			mvaddstr(pole.border_y_max+3,pole.border_x_min+7,str_BUF2);			
+	}
+*/
+/*	
+	if (GameCntrl->getGameStatus()==game_new_level){
+//		mvaddstr(pole.border_y_max/2-5,pole.border_x_max/2-5,"N E X T     L E V E L !!!!");
+//		wrefresh(stdscr);
+//		napms(2000);
+	}
+	if (GameCntrl->getGameStatus()==game_over){
+//		mvaddstr(pole.border_y_max/2-5,pole.border_x_max/2-5,"G A M E   O V E R !!!!");
+//		wrefresh(stdscr);
+//		napms(2000);
+	}
+*/
+
+
+
+
+
+
+
+	
 //**********************************
 
 	return false;
@@ -402,10 +451,12 @@ void MainWindow::_render()
 	
 	if(PST==game_on)
 	{
+	/*
 		if ((GameController->getSnakeLen()-area.unit_snake.getLen())==1){ // !! may be not use operator- "=="
 			GameController->getSnakeBodyPartsCords(GameController->getSnakeLen()-1,tp1);
 			area.unit_snake.addElementInBack(tp1);
 		} 
+	*/
 	
 		if ((GameController->getSnakeLen()-area.unit_snake.getLen())==0){// !! may be use only- "!"
 			for (i=0;i<GameController->getSnakeLen();i++){
@@ -414,11 +465,11 @@ void MainWindow::_render()
 			}		
 		}
 	}
-	if (PST==game_over||PST==game_new){
+	if (PST==game_over/*||PST==game_new*/){
 		for (i=0;i<GameController->getSnakeLen();i++){
 				area.unit_snake.delElementFromBack();
 			}
-
+		area.unit_rabbit.delElementFromBack();
 	}
 
 	area.queue_draw();
@@ -682,7 +733,7 @@ void render(Game *GameCntrl,int FrameFlag)
 	Fild pole;
 
 	pole=GameCntrl->getGameFild();
-		
+/*		
 	if ((GameCntrl->getGameStatus()==game_on)||(GameCntrl->getGameStatus()==game_new_level)){
 		GameCntrl->getRabbitPlace(pen);
 //		mvaddch(pen._y,pen._x,'*');
@@ -708,6 +759,8 @@ void render(Game *GameCntrl,int FrameFlag)
 //			mvaddstr(pole.border_y_max+3,pole.border_x_min,"Level-");			
 //			mvaddstr(pole.border_y_max+3,pole.border_x_min+7,str_BUF2);			
 	}
+*/
+/*	
 	if (GameCntrl->getGameStatus()==game_new_level){
 //		mvaddstr(pole.border_y_max/2-5,pole.border_x_max/2-5,"N E X T     L E V E L !!!!");
 //		wrefresh(stdscr);
@@ -718,7 +771,8 @@ void render(Game *GameCntrl,int FrameFlag)
 //		wrefresh(stdscr);
 //		napms(2000);
 	}
-	
+*/
+
 //	wrefresh(stdscr);
 
 }
