@@ -52,7 +52,7 @@ void GTI(int signom);
 static int row,col;
 static int row_max,col_max;
 static int ch;
-static MoveDirection mvf;
+//static MoveDirection mvf;
 static char str_BUF1[5],str_BUF2[5],str_BUF3[5];
 char buf1[2]={'0',0x00};
 int level;
@@ -66,7 +66,7 @@ class MyArea:public Gtk::DrawingArea
 {
 public:
 	Fild pole;
-	PointArr unit_snake,unit_rabit;
+	PointArr unit_snake,unit_rabbit;
 	GameStatus PST;
 
 
@@ -81,7 +81,7 @@ protected:
 	bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
 };
 
-MyArea::MyArea():unit_snake(0),unit_rabit(0)
+MyArea::MyArea():unit_snake(0),unit_rabbit(0)
 {
 //	unit_snake(0);
 //	unit_rabit(0);
@@ -393,13 +393,33 @@ bool MainWindow::on_key_press_event(GdkEventKey* key_event)
 }
 void MainWindow::_render()
 {
+	int i,LS, ls;
 	Point tp1;
+
 	area.PST=GameController->getGameStatus();
 	GameController->getRabbitPlace(tp1);
-	area.unit_rabit.setElement(tp1,0);
+	area.unit_rabbit.setElement(tp1,0);
+	
+	if(PST==game_on)
+	{
+		if ((GameController->getSnakeLen()-area.unit_snake.getLen())==1){ // !! may be not use operator- "=="
+			GameController->getSnakeBodyPartsCords(GameController->getSnakeLen()-1,tp1);
+			area.unit_snake.addElementInBack(tp1);
+		} 
+	
+		if ((GameController->getSnakeLen()-area.unit_snake.getLen())==0){// !! may be use only- "!"
+			for (i=0;i<GameController->getSnakeLen();i++){
+				GameController->getSnakeBodyPartsCords(i,tp1);
+				area.unit_snake.setElement(tp1,i);
+			}		
+		}
+	}
+	if (PST==game_over||PST==game_new){
+		for (i=0;i<GameController->getSnakeLen();i++){
+				area.unit_snake.delElementFromBack();
+			}
 
-
-
+	}
 
 	area.queue_draw();
 }
