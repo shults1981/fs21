@@ -104,6 +104,9 @@ PointArr::~PointArr()
 
 int PointArr::setElement(const Point & PointSRC, int index) const
 {
+	if (!pArr && !arrLen)
+		return -1;
+
 	if ((index>=0)&&(index<arrLen)){
 		pArr[index]._x=PointSRC._x;
 		pArr[index]._y=PointSRC._y;	
@@ -112,6 +115,64 @@ int PointArr::setElement(const Point & PointSRC, int index) const
 	}
 	else
 		return 0;
+}
+
+int  PointArr::getElement(int index, Point & pointDEST) const
+{
+/*
+	if ((index==0)&&(arrLen==0)){
+			pointDEST._x=pArr->_x;
+			pointDEST._y=pArr->_y;
+			pointDEST._d=pArr->_d;
+			return 1;
+	}
+*/
+	if (!pArr && !arrLen)
+		return -1;
+
+	if ((index>=0)&&(index<arrLen)){
+			pointDEST._x=pArr[index]._x;
+			pointDEST._y=pArr[index]._y;
+			pointDEST._d=pArr[index]._d;
+		return 1;
+	}
+	else 
+		return 0;
+}
+
+int PointArr::delElement(int index)
+{
+	Point *tVar1,*tVar2;
+	if ((index>=0)&&(index<arrLen)){
+		tVar1=new Point[arrLen-1];
+			if (tVar1){
+				for(int i=0;i<index;i++){
+					tVar1[i]._x=pArr[i]._x;
+					tVar1[i]._y=pArr[i]._y;
+					tVar1[i]._d=pArr[i]._d;
+				}
+				for (int i=index;i<arrLen-1;i++){
+					tVar1[i]._x=pArr[i+1]._x;
+					tVar1[i]._y=pArr[i+1]._y;
+					tVar1[i]._d=pArr[i+1]._d;
+				}
+				tVar2=pArr;
+				pArr=tVar1;
+				arrLen-=1;
+				delete []tVar2;
+			}
+			else 
+				return 0;
+	}
+	else
+		return 0;	
+
+}
+
+
+int PointArr::getLen() const
+{
+	return arrLen;
 }
 
 
@@ -241,58 +302,7 @@ int PointArr::delElementFromBegin()
 }
 
 
-int  PointArr::getElement(int index, Point & pointDEST) const
-{
-	if ((index==0)&&(arrLen==0)){
-			pointDEST._x=pArr->_x;
-			pointDEST._y=pArr->_y;
-			pointDEST._d=pArr->_d;
-			return 1;
-	}
-	if ((index>=0)&&(index<arrLen)){
-			pointDEST._x=pArr[index]._x;
-			pointDEST._y=pArr[index]._y;
-			pointDEST._d=pArr[index]._d;
-		return 1;
-	}
-	else 
-		return 0;
-}
 
-int PointArr::delElement(int index)
-{
-	Point *tVar1,*tVar2;
-	if ((index>=0)&&(index<arrLen)){
-		tVar1=new Point[arrLen-1];
-			if (tVar1){
-				for(int i=0;i<index;i++){
-					tVar1[i]._x=pArr[i]._x;
-					tVar1[i]._y=pArr[i]._y;
-					tVar1[i]._d=pArr[i]._d;
-				}
-				for (int i=index;i<arrLen-1;i++){
-					tVar1[i]._x=pArr[i+1]._x;
-					tVar1[i]._y=pArr[i+1]._y;
-					tVar1[i]._d=pArr[i+1]._d;
-				}
-				tVar2=pArr;
-				pArr=tVar1;
-				arrLen-=1;
-				delete []tVar2;
-			}
-			else 
-				return 0;
-	}
-	else
-		return 0;	
-
-}
-
-
-int PointArr::getLen() const
-{
-	return arrLen;
-}
 
 int PointArr::insertElementAfterIndex(int index, Point &PointSRC)
 {

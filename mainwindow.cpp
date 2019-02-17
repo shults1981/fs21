@@ -1,59 +1,25 @@
-/*
-|*****************************************************************
-|*****************************************************************
-* Project                        :  <Funny Snake #2>
+//++++++++++++++++++++++
+//++++++++++++++++++++++
+//   mainwindow.cpp
+//+++++++++++++++++++++
+//+++++++++++++++++++++
 
-* Programm name                  :  funny_snake21.cpp
-
-* Author                         :  Shults1981
-
-* Data create                    :  03/02/2019
-
-* Purpose                        :  classical game "SNAKE";
-				    testing library gtk  #2 (gtkmm)
-
-|****************************************************************
-|****************************************************************
-*/
 #include <gtkmm.h>
 #include <gtkmm/drawingarea.h>
 #include <cairomm/context.h>
 
-
-
 //-----------------------------
 #include "mainwindow.h"
-//#include "game.h"
-//#include "unit.h"
+#include "game.h"
+#include "unit.h"
 
 
 
-using namespace std;
+//-------------------------------------
+//-----------------methods of class MyArea 
 
-
-
-//++++++++++++++++++++++++++++
-/*
-//==================================================
-class MyArea:public Gtk::DrawingArea
-{
-public:
-	Fild pole;
-	PointArr unit_snake,unit_rabbit;
-	GameStatus PST;
-	int Score;
-	int Level;
-
-	MyArea();
-	~MyArea();
-
-protected:
-
-	guint X_max,Y_max;
-
-
-	bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
-};
+static char str_BUF1[5],str_BUF2[5],str_BUF3[5];
+char buf1[2]={'0',0x00};
 
 MyArea::MyArea():unit_snake(0),unit_rabbit(0)
 {
@@ -201,30 +167,9 @@ bool MyArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
 }
 
-//====================================================
-class MainWindow: public Gtk::Window
-{
-public:
-	MainWindow();		
-	virtual ~MainWindow();
+//-------------------------------------
+//-----------------methods of class MainWindow 
 
-	Fild gameFild;
-	Game *GameController; //!!!!!!
-	MoveDirection mvf;    ///!!
-
-protected:
-
-	GameStatus PST;
-
-	MyArea area;
-
-
-	bool Tic();
-	bool Main_Loop();
-	bool on_key_press_event(GdkEventKey* key_event);	
-	void OnQuit();
-	void _render();	
-};
 
 MainWindow::MainWindow()
 {
@@ -429,27 +374,5 @@ void MainWindow::OnQuit()
 
 
 //++++++++++++++++++++++++++++
-*/
 
-//ofstream fout;//**********************-------------------
 
-//============================= MAIN ======================================
-		
-int main (int argc, char** argv)
-{	
-	
-//	fout.open("fs2.log");//**************-------------------
-
-	Glib::RefPtr<Gtk::Application> app;
-	//auto app=Gtk::Application::create(argc,argv,"org.gtkmm.examples.base"); //if using C++11 or hi
-	app=Gtk::Application::create(argc,argv,"org.gtkmm.examples.base");
-
-	MainWindow w;
-
-	
-//	fout.close();
-
-	app->run(w);
-	return 0;
-
-}

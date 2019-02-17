@@ -20,9 +20,9 @@ struct Point
 
 class PointArr
 {
+private:
 	Point *pArr;
 	int arrLen;
-private:
 	PointArr();
 
 public:
