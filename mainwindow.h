@@ -51,16 +51,22 @@ public:
 	MainWindow();		
 	virtual ~MainWindow();
 
+
+
+protected:
 	Fild gameFild;
 	Game *GameController; //!!!!!!
 	MoveDirection mvf;    ///!!
 
-protected:
+	sigc::connection timerSource;
+	//int timerSource;
+	guint TimeBase;
+	guint LevelTimeStep;
+	guint GamePause;
 
 	GameStatus PST;
 
 	MyArea area;
-
 
 	bool Tic();
 	bool Main_Loop();

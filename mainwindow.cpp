@@ -13,13 +13,10 @@
 #include "game.h"
 #include "unit.h"
 
-
-
-//-------------------------------------
-//-----------------methods of class MyArea 
-
-static char str_BUF1[5],str_BUF2[5],str_BUF3[5];
-char buf1[2]={'0',0x00};
+//-----------------------------------------------------
+//-----------------------------------------------------
+//-----------------------------------------------------
+//-----------------methods of class MyArea -----------
 
 MyArea::MyArea():unit_snake(0),unit_rabbit(0)
 {
@@ -44,6 +41,8 @@ bool MyArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 	guint scr_border_x_min,scr_border_x_max,scr_border_y_min,scr_border_y_max;
 	gfloat hStep,vStep;
 
+	char str_BUF1[5],str_BUF2[5],str_BUF3[5];
+	char buf1[2]={'0',0x00};
 
 	Gtk::Allocation allocation = get_allocation();	
 
@@ -60,8 +59,6 @@ bool MyArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
 	hStep=(gfloat)(scr_border_x_max-scr_border_x_min)/(gfloat)(pole.border_x_max-pole.border_x_min);
 	vStep=(gfloat)(scr_border_y_max-scr_border_y_min)/(gfloat)(pole.border_y_max-pole.border_y_min);
-
-//	gtk_render_background(context,cr,0,0,width,height);
 
 	//---------- Make game fild ----------------------
 	color.red=0.0;
@@ -146,8 +143,6 @@ bool MyArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 		cr->show_text(str_BUF2);
 	}
 
-	
-
 	if (PST==game_new_level)
 	{
 		cr->move_to(scr_border_x_max/2-30,scr_border_y_max/2-20);
@@ -161,19 +156,25 @@ bool MyArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 	}
 
 	cr->fill();
-	
 
 	return false;
 
 }
-
-//-------------------------------------
-//-----------------methods of class MainWindow 
+//-------------------------------------------------------------
+//-------------------------------------------------------------
+//-------------------------------------------------------------
+//----------------- methods of class MainWindow ---------------
 
 
 MainWindow::MainWindow()
 {
 	PST=game_stop;
+
+	TimeBase=200;
+	LevelTimeStep=6;
+	GamePause=5;
+
+
 	gameFild.border_x_min=0;
 	gameFild.border_x_max=50;
 	gameFild.border_y_min=0;
@@ -188,9 +189,7 @@ MainWindow::MainWindow()
 
 	add_events(Gdk::KEY_PRESS_MASK);
 	
-	Glib::signal_timeout().connect( sigc::mem_fun(*this, &MainWindow::Tic), 200 );
-
-
+	timerSource=Glib::signal_timeout().connect( sigc::mem_fun(*this, &MainWindow::Tic), TimeBase );
 
 	area.show();		
 
@@ -227,6 +226,8 @@ bool MainWindow::Main_Loop()
 			GameController->setGameStatus(game_on);
 			mvf=static_cast<MoveDirection>(0);
 			PST=game_on;
+			timerSource.disconnect();
+			timerSource=Glib::signal_timeout().connect( sigc::mem_fun(*this, &MainWindow::Tic), TimeBase );
 			break;
 		case game_stop:
 			GameController->setGameStatus(game_stop);
@@ -242,7 +243,6 @@ bool MainWindow::Main_Loop()
 		default:
 			break;
 	}
-
 	
 		if (GameController->getGameStatus()==game_on)
 		{
@@ -314,9 +314,11 @@ bool MainWindow::on_key_press_event(GdkEventKey* key_event)
 
 	return true;
 }
+
+
 void MainWindow::_render()
 {
-	int i,LS, ls;
+	int i;
 	Point tp1;
 
 	area.PST=GameController->getGameStatus();
@@ -335,14 +337,15 @@ void MainWindow::_render()
 			area.unit_rabbit.setElement(tp1,0);
 	
 	
-		if ((GameController->getSnakeLen()-area.unit_snake.getLen())==1){ // !! may be not use operator- "=="
+		if ((GameController->getSnakeLen()-area.unit_snake.getLen())){ // !! may be not use operator- "=="
 			GameController->getSnakeBodyPartsCords(GameController->getSnakeLen()-1,tp1);
-			if (!area.unit_snake.getLen())
+//			if (area.unit_snake.getLen()){
 				area.unit_snake.addElementInBack(tp1);
 				g_print("---add in frameback---\n");
-		} 
-			
-		if ((GameController->getSnakeLen()-area.unit_snake.getLen())==0){// !! may be use only- "!"
+//			}
+		}
+//		else {			
+		if (!(GameController->getSnakeLen()-area.unit_snake.getLen())){// !! may be use only- "!"
 			if (area.unit_snake.getLen()){
 				for (i=0;i<GameController->getSnakeLen();i++){
 					GameController->getSnakeBodyPartsCords(i,tp1);
@@ -353,13 +356,15 @@ void MainWindow::_render()
 		}
 	}
 
-	if (PST==game_over||PST==game_new){
+	if (/*PST==game_over||*/PST==game_new){
 
-		for (i=area.unit_snake.getLen()-1;i>=0;i--){
-				area.unit_snake.delElementFromBack();
+		for (i=0;i<area.unit_snake.getLen();i++){
+				if (area.unit_snake.getLen())
+					area.unit_snake.delElementFromBack();
 			}
 
-		area.unit_rabbit.delElementFromBack();
+		if (area.unit_rabbit.getLen())
+			area.unit_rabbit.delElementFromBack();
 
 		g_print("---clear frame----\n");
 	}
@@ -371,8 +376,5 @@ void MainWindow::OnQuit()
 {
 	hide();
 }
-
-
-//++++++++++++++++++++++++++++
 
 
