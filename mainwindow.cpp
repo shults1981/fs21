@@ -173,7 +173,7 @@ MainWindow::MainWindow()
 	TimeBase=200;
 	LevelTimeStep=6;
 	GamePause=5;
-
+	delay_cnt=0;
 
 	gameFild.border_x_min=0;
 	gameFild.border_x_max=50;
@@ -217,6 +217,7 @@ bool MainWindow::Main_Loop()
 		case game_exit:
 			GameController->setGameStatus(game_over);
 			GameController->setGameStatus(game_exit);
+			timerSource.disconnect();
 			OnQuit();
 			break;
 		case game_new:
@@ -225,6 +226,7 @@ bool MainWindow::Main_Loop()
 			GameController->setGameStatus(game_new);
 			GameController->setGameStatus(game_on);
 			mvf=static_cast<MoveDirection>(0);
+			delay_cnt=0;
 			PST=game_on;
 			timerSource.disconnect();
 			timerSource=Glib::signal_timeout().connect( sigc::mem_fun(*this, &MainWindow::Tic), TimeBase );
@@ -233,13 +235,19 @@ bool MainWindow::Main_Loop()
 			GameController->setGameStatus(game_stop);
 			break;
 		case game_on:
+
 			if(GameController->getGameStatus()!=game_over){
 				GameController->setGameStatus(game_on);
 			}
-			else{
-				 PST=game_stop;
-			}
+			if(GameController->getGameStatus()==game_over)	
+				PST=game_stop;
+
 			break;
+		case game_over:
+//			if ((delay_cnt++)>GamePause)
+				PST=game_stop;
+			break;
+
 		default:
 			break;
 	}
@@ -251,16 +259,29 @@ bool MainWindow::Main_Loop()
 		}
 
 		if (GameController->getGameStatus()==game_new_level){
-			GameController->setGameStatus(game_stop);
-			GameController->setGameStatus(game_over);
-			GameController->setGameStatus(game_new);
-			GameController->setGameStatus(game_on);
-			mvf=static_cast<MoveDirection>(0);
+			PST=game_new_level;
+			if ((delay_cnt++)>GamePause){
+
+				GameController->setGameStatus(game_stop);
+				GameController->setGameStatus(game_over);
+				GameController->setGameStatus(game_new);
+				GameController->setGameStatus(game_on);
+				mvf=static_cast<MoveDirection>(0);
+				delay_cnt=0;
+				PST=game_on;
+				timerSource.disconnect();
+				timerSource=Glib::signal_timeout().connect( sigc::mem_fun(*this, &MainWindow::Tic), 
+									   TimeBase-(GameController->getGameLevel()-1)*LevelTimeStep);
+			}
 		}
-
-		if (GameController->getGameStatus()==game_over)
-			PST=game_over;
-
+/*
+		if (GameController->getGameStatus()==game_over){
+			if ((delay_cnt++)>GamePause)
+				PST=game_stop;
+			else
+				PST=game_over;
+		}
+*/
 
 	g_print("Game Step\n");					
 	return true;

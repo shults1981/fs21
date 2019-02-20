@@ -63,6 +63,7 @@ protected:
 	guint TimeBase;
 	guint LevelTimeStep;
 	guint GamePause;
+	guint delay_cnt;
 
 	GameStatus PST;
 
