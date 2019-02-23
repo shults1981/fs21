@@ -202,18 +202,74 @@ MainWindow::~MainWindow()
 
 }
 
+bool MainWindow::on_key_press_event(GdkEventKey* key_event)
+{
+
+	if (key_event->keyval==GDK_KEY_m){
+		PST=game_stop;
+	}
+
+	if (PST==game_stop||PST==game_over){
+		switch (key_event->keyval)  {
+			case GDK_KEY_e:
+			case GDK_KEY_E:
+				PST=game_exit;
+				break;
+			case GDK_KEY_n:
+			case GDK_KEY_N:
+				PST=game_new;
+				break;
+			case GDK_KEY_c:
+				PST=game_on;
+				break;
+			default:
+				break;
+		}
+	}
+
+	if (PST==game_on){
+		switch(key_event->keyval)
+		{
+			case GDK_KEY_Left:
+					mvf=Left;
+	//				g_print("Pressed key -Left key-\n");					
+					break;			
+			case GDK_KEY_Right:
+					mvf=Right;
+	//				g_print("Pressed key -Right key-\n");					
+					break;
+			case GDK_KEY_Up:
+					mvf=Up;
+	//				g_print("Pressed key -Up key-\n");					
+					break;
+			case GDK_KEY_Down:
+					mvf=Down;
+	//				g_print("Pressed key -Down key-\n");					
+					break; 
+			default : break;
+			}
+	}
+
+	return true;
+}
+
+void MainWindow::OnQuit()
+{
+	hide();
+}
+
+
 bool MainWindow::Tic()
 {
 	Main_Loop();
-	_render();	
+	_PreRender();	
 	
 	return true;
 }
 
 bool MainWindow::Main_Loop()
 {
-	switch (PST)
-	{
+	switch (PST){
 		case game_exit:
 			GameController->setGameStatus(game_over);
 			GameController->setGameStatus(game_exit);
@@ -223,16 +279,24 @@ bool MainWindow::Main_Loop()
 		case game_new:
 			GameController->setGameStatus(game_stop);
 			GameController->setGameStatus(game_over);
-			GameController->setGameStatus(game_new);
-			GameController->setGameStatus(game_on);
+//			GameController->setGameStatus(game_new);
 			mvf=static_cast<MoveDirection>(0);
-			delay_cnt=0;
-			PST=game_on;
+//			delay_cnt=0;
+			if ((delay_cnt)==1){
+				GameController->setGameStatus(game_new);
+				GameController->setGameStatus(game_on);
+				PST=game_on;
+				delay_cnt=0;
+			}
+			else
+				delay_cnt++;
 			timerSource.disconnect();
 			timerSource=Glib::signal_timeout().connect( sigc::mem_fun(*this, &MainWindow::Tic), TimeBase );
+			GTC.ResetCount();
 			break;
 		case game_stop:
 			GameController->setGameStatus(game_stop);
+			delay_cnt=0;
 			break;
 		case game_on:
 
@@ -240,11 +304,11 @@ bool MainWindow::Main_Loop()
 				GameController->setGameStatus(game_on);
 			}
 			if(GameController->getGameStatus()==game_over)	
-				PST=game_stop;
+				PST=game_over;
 
 			break;
 		case game_over:
-//			if ((delay_cnt++)>GamePause)
+			if ((delay_cnt++)>GamePause)
 				PST=game_stop;
 			break;
 
@@ -256,6 +320,7 @@ bool MainWindow::Main_Loop()
 		{
 				GameController->SnakeControl(mvf);
 				GameController->SnakeMoveToOneStep();
+				GTC.CountUp();
 		}
 
 		if (GameController->getGameStatus()==game_new_level){
@@ -274,77 +339,33 @@ bool MainWindow::Main_Loop()
 									   TimeBase-(GameController->getGameLevel()-1)*LevelTimeStep);
 			}
 		}
-/*
-		if (GameController->getGameStatus()==game_over){
-			if ((delay_cnt++)>GamePause)
-				PST=game_stop;
-			else
-				PST=game_over;
-		}
-*/
 
-	g_print("Game Step\n");					
-	return true;
-}
-
-bool MainWindow::on_key_press_event(GdkEventKey* key_event)
-{
-
-	if (key_event->keyval==GDK_KEY_m){
-		PST=game_stop;
-	}
-
-	if (PST==game_on){
-		switch(key_event->keyval)
-		{
-			case GDK_KEY_Left:
-					mvf=Left;
-					g_print("Pressed key -Left key-\n");					
-					break;			
-			case GDK_KEY_Right:
-					mvf=Right;
-					g_print("Pressed key -Right key-\n");					
-					break;
-			case GDK_KEY_Up:
-					mvf=Up;
-					g_print("Pressed key -Up key-\n");					
-					break;
-			case GDK_KEY_Down:
-					mvf=Down;
-					g_print("Pressed key -Down key-\n");					
-					break; 
-			default : break;
-			}
-	}
-
-	if (PST==game_stop||PST==game_over){
-		switch (key_event->keyval)  {
-			case GDK_KEY_e:
-				PST=game_exit;
-				break;
-			case GDK_KEY_n:
-				PST=game_new;
-				break;
-			case GDK_KEY_c:
-				PST=game_on;
-				break;
-			default:
-				break;
-		}
-	}
+	g_print("Game step! PST-%d\n",PST);					
 
 	return true;
 }
 
 
-void MainWindow::_render()
+
+void MainWindow::_PreRender()
 {
 	int i;
 	Point tp1;
 
-	area.PST=GameController->getGameStatus();
+	area.PST=PST;
+	area.btmr=GTC.getGameTime();
+	if (PST==game_over||PST==game_new||PST==game_new_level){
 
+		for (i=0;i<area.unit_snake.getLen();i++){
+				if (area.unit_snake.getLen())
+					area.unit_snake.delElementFromBack();
+			}
 
+		if (area.unit_rabbit.getLen())
+			area.unit_rabbit.delElementFromBack();
+
+		g_print("---clear frame----\n");
+	}
 
 	if(PST==game_on)
 	{
@@ -377,25 +398,76 @@ void MainWindow::_render()
 		}
 	}
 
-	if (/*PST==game_over||*/PST==game_new){
 
-		for (i=0;i<area.unit_snake.getLen();i++){
-				if (area.unit_snake.getLen())
-					area.unit_snake.delElementFromBack();
-			}
-
-		if (area.unit_rabbit.getLen())
-			area.unit_rabbit.delElementFromBack();
-
-		g_print("---clear frame----\n");
-	}
 
 	area.queue_draw();
 }
 
-void MainWindow::OnQuit()
+//-------------------------------------------------------------
+//-------------------------------------------------------------
+//-------------------------------------------------------------
+//------------- methods of class  GameTimeCounter---------------
+
+GameTimeCounter::GameTimeCounter()
 {
-	hide();
+	GameTime.sec=0;
+	GameTime.min=0;
+	GameTime.hour=0;
 }
+
+GameTimeCounter::~GameTimeCounter()
+{
+
+}
+
+TimeData GameTimeCounter::getGameTime()
+{
+
+	return GameTime;
+}	
+
+bool GameTimeCounter::CountUp()
+{
+	GameTime.sec++;
+	if(GameTime.sec==60){
+		GameTime.min++;
+		GameTime.sec=0;
+	}
+	if(GameTime.min==60){
+		GameTime.hour++;
+		GameTime.min=0;
+	}
+	if(GameTime.hour==24) 
+		GameTime.hour=0;
+	return true;
+}
+
+bool GameTimeCounter::CountDown()
+{
+
+	return true;
+}
+
+bool GameTimeCounter::ResetCount()
+{
+	GameTime.sec=0;
+	GameTime.min=0;
+	GameTime.hour=0;
+
+	return true;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

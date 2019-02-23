@@ -20,7 +20,33 @@
 
 
 
-//++++++++++++++++++++++++++++
+//==================================================
+typedef struct _timedata_
+	{
+		unsigned int sec;
+		unsigned int min;
+		unsigned int hour;
+	} TimeData;
+
+
+
+
+class GameTimeCounter
+{
+private:
+	TimeData GameTime;
+
+public:
+	GameTimeCounter();
+	~GameTimeCounter();
+
+	TimeData getGameTime();	
+	bool	CountUp();
+	bool	CountDown();
+	bool	ResetCount();
+};
+
+
 //==================================================
 class MyArea:public Gtk::DrawingArea
 {
@@ -30,6 +56,7 @@ public:
 	GameStatus PST;
 	int Score;
 	int Level;
+	TimeData btmr;
 
 	MyArea();
 	~MyArea();
@@ -57,6 +84,7 @@ protected:
 	Fild gameFild;
 	Game *GameController; //!!!!!!
 	MoveDirection mvf;    ///!!
+	GameTimeCounter GTC;
 
 	sigc::connection timerSource;
 	//int timerSource;
@@ -73,7 +101,7 @@ protected:
 	bool Main_Loop();
 	bool on_key_press_event(GdkEventKey* key_event);	
 	void OnQuit();
-	void _render();	
+	void _PreRender();	
 };
 
 
