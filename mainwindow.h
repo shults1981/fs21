@@ -82,12 +82,11 @@ public:
 
 protected:
 	Fild gameFild;
-	Game *GameController; //!!!!!!
-	MoveDirection mvf;    ///!!
+	Game *GameController; 
+	MoveDirection mvf;   
 	GameTimeCounter GTC;
 
 	sigc::connection timerSource;
-	//int timerSource;
 	guint TimeBase;
 	guint LevelTimeStep;
 	guint GamePause;

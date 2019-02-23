@@ -41,8 +41,8 @@ bool MyArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 	guint scr_border_x_min,scr_border_x_max,scr_border_y_min,scr_border_y_max;
 	gfloat hStep,vStep;
 
-	char str_BUF1[5],str_BUF2[5],str_BUF3[5];
-	char buf1[2]={'0',0x00};
+	char str_BUF1[5],str_BUF2[5],str_BUF3[8];
+//	char buf1[2]={'0',0x00};
 
 	Gtk::Allocation allocation = get_allocation();	
 
@@ -133,14 +133,21 @@ bool MyArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 		sprintf (str_BUF1,"%d",Score);
 		cr->move_to(scr_border_x_min,scr_border_y_max+15);
 		cr->show_text("Score-");
-		cr->move_to(scr_border_x_min+60,scr_border_y_max+15);
+		cr->move_to(scr_border_x_min+35,scr_border_y_max+15);
 		cr->show_text(str_BUF1);
 
 		sprintf (str_BUF2,"%d",Level);
 		cr->move_to(scr_border_x_min,scr_border_y_max+25);
 		cr->show_text("Level-");
-		cr->move_to(scr_border_x_min+60,scr_border_y_max+25);
+		cr->move_to(scr_border_x_min+35,scr_border_y_max+25);
 		cr->show_text(str_BUF2);
+
+		sprintf(str_BUF3,"%d:%d:%d",btmr.hour,btmr.min,btmr.sec);
+
+		cr->move_to(scr_border_x_min+100,scr_border_y_max+15);
+		cr->show_text("Time-");
+		cr->move_to(scr_border_x_min+135,scr_border_y_max+15);
+		cr->show_text(str_BUF3);
 	}
 
 	if (PST==game_new_level)
@@ -171,7 +178,7 @@ MainWindow::MainWindow()
 	PST=game_stop;
 
 	TimeBase=200;
-	LevelTimeStep=6;
+	LevelTimeStep=20;
 	GamePause=5;
 	delay_cnt=0;
 
@@ -379,7 +386,7 @@ void MainWindow::_PreRender()
 			area.unit_rabbit.setElement(tp1,0);
 	
 	
-		if ((GameController->getSnakeLen()-area.unit_snake.getLen())){ // !! may be not use operator- "=="
+		if ((GameController->getSnakeLen()-area.unit_snake.getLen())){ 
 			GameController->getSnakeBodyPartsCords(GameController->getSnakeLen()-1,tp1);
 //			if (area.unit_snake.getLen()){
 				area.unit_snake.addElementInBack(tp1);
@@ -387,7 +394,7 @@ void MainWindow::_PreRender()
 //			}
 		}
 //		else {			
-		if (!(GameController->getSnakeLen()-area.unit_snake.getLen())){// !! may be use only- "!"
+		if (!(GameController->getSnakeLen()-area.unit_snake.getLen())){
 			if (area.unit_snake.getLen()){
 				for (i=0;i<GameController->getSnakeLen();i++){
 					GameController->getSnakeBodyPartsCords(i,tp1);
